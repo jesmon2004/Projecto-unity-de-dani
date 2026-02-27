@@ -44,3 +44,6 @@ TagManager:
   - name: nave
     uniqueID: 2422505289
     locked: 0
+  - name: enemy
+    uniqueID: 2075023631
+    locked: 0

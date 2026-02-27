@@ -7,64 +7,86 @@ public class NaveController : MonoBehaviour
     private float limiteIzquierdo;
     private float limiteDerecho;
 
-    SpriteRenderer spriteRenderer;
+    //La variable dirección pasa a ser un atributo del script 
+    public float direccionX = 0f;
 
-    //tamaño sprite
+    [Header("Configuración de Disparo")]
+    // Definir dos atributos públicos para el misil y el punto de disparo 
+    public GameObject misilPrefab;
+    public Transform firePoint;
+
+    SpriteRenderer spriteRenderer;
     private float spriteWidth;
 
     void Start()
     {
-        
         CalcularLimitesPantalla();
     }
 
     void Update()
     {
         MoverNave();
+
+        // Disparo por teclado con la barra espaciadora 
+        if (Input.GetKeyDown(KeyCode.Space))
+        {
+            fire();
+        }
     }
 
     void CalcularLimitesPantalla()
     {
+        //Tu lógica para que no se salga de los límites de la pantalla se mantiene intacta 
         spriteRenderer = GetComponent<SpriteRenderer>();
-        
-        
-        // Obtener el tamaño del sprite (mitad ancho y alto)
         spriteWidth = spriteRenderer.bounds.extents.x;
         
-
-        // Calculamos los límites del mundo basados en la cámara principal
         Camera cam = Camera.main;
         float distanciaZ = transform.position.z - cam.transform.position.z;
         
-        // Esquina inferior izquierda (0,0) y superior derecha (1,1) en viewport
         limiteIzquierdo = cam.ViewportToWorldPoint(new Vector3(0, 0, distanciaZ)).x + spriteWidth;
         limiteDerecho = cam.ViewportToWorldPoint(new Vector3(1, 0, distanciaZ)).x - spriteWidth;
     }
 
     void MoverNave()
     {
-        float inputHorizontal = 0f;
-
-        //Entrada por Teclado (A/D o Flechas)
-        inputHorizontal = Input.GetAxisRaw("Horizontal");
-
-        //Entrada por Pantalla Táctil o clic del ratón para pruebas
-        if (Input.GetMouseButton(0)) 
+        //Mantenemos el movimiento por teclado, tal y como está ahora 
+        float movTeclado = Input.GetAxisRaw("Horizontal");
+        
+        if (movTeclado != 0) 
         {
-            // Dividimos la pantalla en dos mitades
-            if (Input.mousePosition.x < Screen.width / 2)
-                inputHorizontal = -1f; // Izquierda
-            else
-                inputHorizontal = 1f;  // Derecha
+            direccionX = movTeclado;
+        }
+        else if (Input.GetKeyUp(KeyCode.A) || Input.GetKeyUp(KeyCode.D) || Input.GetKeyUp(KeyCode.LeftArrow) || Input.GetKeyUp(KeyCode.RightArrow))
+        {
+            // Para que no se quede moviéndose sola cuando soltamos la tecla
+            direccionX = 0f;
         }
 
-        // Calcular nueva posición
-        float nuevaX = transform.position.x + (inputHorizontal * velocidad * Time.deltaTime);
+        // Calcular nueva posición basándose en la direccionX
+        float nuevaX = transform.position.x + (direccionX * velocidad * Time.deltaTime);
 
-        //Limitar el movimiento
+        // Limitar el movimiento para no salir de la pantalla
         nuevaX = Mathf.Clamp(nuevaX, limiteIzquierdo, limiteDerecho);
 
         // Aplicar posición
         transform.position = new Vector3(nuevaX, transform.position.y, transform.position.z);
+    }
+
+    // Método llamado desde los botones UI para mover la nave 
+    public void setMovimiento(float x, float y)
+    {
+        direccionX = x;
+    }
+
+    // Método llamado desde los botones UI al levantar el dedo para parar la nave 
+    public void pararMovimiento()
+    {
+        direccionX = 0f;
+    }
+
+    // Método encargado de implementar el disparo e instanciar el misil 
+    public void fire()
+    {
+        Instantiate(misilPrefab, firePoint.position, Quaternion.identity); 
     }
 }
