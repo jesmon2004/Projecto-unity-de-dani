@@ -3,9 +3,8 @@ using UnityEngine;
 public class EnemigoController : MonoBehaviour
 {
     public float velocidad = 3f;
-    
-   
     public GameObject explosionPrefab;
+    public GameObject powerUpPrefab; // Arrastra aquí el prefab de la estrella
 
     void Update()
     {
@@ -21,16 +20,16 @@ public class EnemigoController : MonoBehaviour
     {
         if (collision.CompareTag("misil"))
         {
-            // Destruimos el misil
             Destroy(collision.gameObject);
-            
-            //   Instanciamos la explosión en la posición actual del marciano
             Instantiate(explosionPrefab, transform.position, Quaternion.identity);
-
-            //  Sumamos 10 puntos usando el Singleton del ScoreManager
             ScoreManager.instance.AddScore(10);
+            
+            //  20% de probabilidad de soltar el PowerUp
+            if (Random.Range(0, 100) < 20)
+            {
+                Instantiate(powerUpPrefab, transform.position, Quaternion.identity);
+            }
 
-            // Destruimos este enemigo
             Destroy(gameObject);
         }
     }

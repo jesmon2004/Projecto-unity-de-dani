@@ -1,19 +1,33 @@
 using UnityEngine;
+using System.Collections; // Necesario para Corrutinas
 
 public class EnemySpawner : MonoBehaviour
 {
-    public GameObject enemyPrefab; // Prefab del enemigo
-    public float interval = 2f;    // Cada cuánto tiempo sale un marciano
+    public GameObject enemyPrefab;
+    public float interval = 2f;
 
     void Start()
     {
-        // Repite el método SpawnEnemy cada 'interval' segundos, empezando tras 1 segundo.
-        InvokeRepeating("SpawnEnemy", 1f, interval);
+        // SUSTITUIMOS EL INVOKE POR LA CORRUTINA
+        StartCoroutine(GenerarEnemigos());
+    }
+
+    IEnumerator GenerarEnemigos()
+    {
+        // Esperamos 1 segundo antes de empezar a spawnear
+        yield return new WaitForSeconds(1f);
+
+        // Bucle infinito que funciona paralelo al juego
+        while (true)
+        {
+            SpawnEnemy();
+            // Pausa la ejecución de este bucle durante los segundos del intervalo
+            yield return new WaitForSeconds(interval);
+        }
     }
 
     void SpawnEnemy()
     {
-        // Calculamos un límite X aleatorio basado en la cámara para que no salgan por fuera
         Camera cam = Camera.main;
         float height = 2f * cam.orthographicSize;
         float width = height * cam.aspect;
@@ -22,7 +36,6 @@ public class EnemySpawner : MonoBehaviour
         float randomX = Random.Range(-limitX, limitX);
         Vector3 spawnPosition = new Vector3(randomX, transform.position.y, 0);
 
-        // Instanciamos el enemigo
         Instantiate(enemyPrefab, spawnPosition, Quaternion.identity);
     }
 }
