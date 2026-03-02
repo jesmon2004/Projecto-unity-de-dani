@@ -21,6 +21,7 @@ public class NaveController : MonoBehaviour
     [Header("Sonidos y UI")]
     private AudioSource audioSource;
     public AudioClip sonidoDisparo; // Arrastra tu láser aquí
+    public AudioClip sonidoDisparoDoble;
     public AudioClip sonidoPowerUp; // Arrastra tu sonido de estrella aquí
     
     [Header("HUD PowerUp")]
@@ -29,6 +30,8 @@ public class NaveController : MonoBehaviour
 
     SpriteRenderer spriteRenderer;
     private float spriteWidth;
+
+    private Coroutine corrutinaPowerUp;
 
     void Start()
     {
@@ -102,7 +105,15 @@ public class NaveController : MonoBehaviour
         {
             audioSource.PlayOneShot(sonidoPowerUp);
             Destroy(collision.gameObject);
-            StartCoroutine(ActivarDobleDisparo(5f)); // Inicia la corrutina por 5 segundos
+
+            // Si ya hay una corrutina de tiempo funcionando, la detenemos
+            if (corrutinaPowerUp != null)
+            {
+                StopCoroutine(corrutinaPowerUp);
+            }
+
+            //Iniciamos una corrutina nueva y la guardamos en nuestra variable
+            corrutinaPowerUp = StartCoroutine(ActivarDobleDisparo(5f)); 
         }
     }
 

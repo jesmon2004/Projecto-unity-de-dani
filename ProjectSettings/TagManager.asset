@@ -6,6 +6,7 @@ TagManager:
   tags:
   - misil
   - Enemy
+  - PowerUp
   layers:
   - Default
   - TransparentFX
