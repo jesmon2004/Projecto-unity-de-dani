@@ -1,7 +1,8 @@
 using UnityEngine;
-using UnityEngine.SceneManagement; // Necesario para reiniciar la escena
-using System.Collections; // Necesario para las Corrutinas
-using TMPro; // Necesario para la UI
+using UnityEngine.SceneManagement; 
+using System.Collections; 
+using TMPro; 
+using UnityEngine.UI; // IMPORTANTE PARA LA BARRA DE VIDA
 
 public class NaveController : MonoBehaviour
 {
@@ -14,30 +15,33 @@ public class NaveController : MonoBehaviour
     [Header("Configuración de Disparo")]
     public GameObject misilPrefab;
     public Transform firePoint;
-    public Transform firePointIzquierdo; // NUEVO
-    public Transform firePointDerecho;   // NUEVO
+    public Transform firePointIzquierdo; 
+    public Transform firePointDerecho;   
     private bool dobleDisparo = false;
 
     [Header("Sonidos y UI")]
     private AudioSource audioSource;
-    public AudioClip sonidoDisparo; // Arrastra tu láser aquí
+    public AudioClip sonidoDisparo; 
     public AudioClip sonidoDisparoDoble;
-    public AudioClip sonidoPowerUp; // Arrastra tu sonido de estrella aquí
+    public AudioClip sonidoPowerUp; 
     
     [Header("HUD PowerUp")]
-    public GameObject hudPowerUp; // Arrastra tu PanelPowerUp
-    public TMP_Text textoTiempoPowerUp; // Arrastra tu texto "5s"
+    public GameObject hudPowerUp; 
+    public TMP_Text textoTiempoPowerUp; 
+
+    [Header("Sistema de Vidas")]
+    public int vidas = 3; // Atributo público de vidas
+    public Image barraVida; // Atributo público para la barra UI
 
     SpriteRenderer spriteRenderer;
     private float spriteWidth;
-
     private Coroutine corrutinaPowerUp;
 
     void Start()
     {
         CalcularLimitesPantalla();
         audioSource = GetComponent<AudioSource>();
-        if(hudPowerUp != null) hudPowerUp.SetActive(false); // Nos aseguramos de ocultarlo
+        if(hudPowerUp != null) hudPowerUp.SetActive(false); 
     }
 
     void Update()
@@ -75,7 +79,6 @@ public class NaveController : MonoBehaviour
 
     public void fire()
     {
-        // Lógica del PowerUp
         if (dobleDisparo)
         {
             Instantiate(misilPrefab, firePointIzquierdo.position, Quaternion.identity);
@@ -85,44 +88,65 @@ public class NaveController : MonoBehaviour
         {
             Instantiate(misilPrefab, firePoint.position, Quaternion.identity);
         }
-        
-        // Usamos PlayOneShot para que no se corten los sonidos si disparamos rápido o cogemos la estrella
         audioSource.PlayOneShot(sonidoDisparo);
     }
 
-    // GESTIÓN DE COLISIONES
+    // Nuevo método para recibir impactos
+    public void RecibirImpacto(int cantidad)
+    {
+        vidas -= cantidad; // Restar vidas
+        StartCoroutine(EfectoImpacto()); // Efecto de impacto
+
+        if (vidas == 2)
+        {
+            barraVida.color = new Color(1f, 0.5f, 0f); // Naranja [cite: 285]
+            barraVida.fillAmount = 0.66f; // Quita 1/3 [cite: 285]
+        }
+        else if (vidas == 1)
+        {
+            barraVida.color = Color.red; // Rojo [cite: 286]
+            barraVida.fillAmount = 0.33f; // Quita 2/3 [cite: 286]
+        }
+        else if (vidas <= 0)
+        {
+            // Game Over
+            if(barraVida != null) barraVida.gameObject.SetActive(false); // Elimina barra de vida
+            Destroy(gameObject); // Destruir la nave
+            SceneManager.LoadScene("GameOverScene");
+        }
+    }
+
+    // Coroutine para el color de impacto
+    IEnumerator EfectoImpacto()
+    {
+        spriteRenderer.color = Color.red; // Modificar a rojo
+        yield return new WaitForSeconds(0.1f); // Esperar
+        spriteRenderer.color = Color.white; // Volver normal
+    }
+
     private void OnTriggerEnter2D(Collider2D collision)
     {
-        // 1. Colisión con el enemigo (Game Over)
         if (collision.CompareTag("Enemy"))
         {
-            // Reiniciamos la escena (Puedes cambiarlo por "GameOver" si creas una escena para ello)
-            SceneManager.LoadScene("GameOverScene"); 
+            RecibirImpacto(3); // Destruye del todo al chocar con una nave enemiga (Game Over)
         }
 
-        // 2. Colisión con el PowerUp
         if (collision.CompareTag("PowerUp"))
         {
             audioSource.PlayOneShot(sonidoPowerUp);
             Destroy(collision.gameObject);
-
-            // Si ya hay una corrutina de tiempo funcionando, la detenemos
             if (corrutinaPowerUp != null)
-            {
-                StopCoroutine(corrutinaPowerUp);
+            { 
+                StopCoroutine(corrutinaPowerUp); 
             }
-
-            //Iniciamos una corrutina nueva y la guardamos en nuestra variable
             corrutinaPowerUp = StartCoroutine(ActivarDobleDisparo(5f)); 
         }
     }
 
-    // CORRUTINA DE TIEMPO DE POWER UP
     IEnumerator ActivarDobleDisparo(float tiempo)
     {
         dobleDisparo = true;
         hudPowerUp.SetActive(true);
-
         float tiempoRestante = tiempo;
 
         while (tiempoRestante > 0)
@@ -135,6 +159,4 @@ public class NaveController : MonoBehaviour
         dobleDisparo = false;
         hudPowerUp.SetActive(false);
     }
-
-    
 }

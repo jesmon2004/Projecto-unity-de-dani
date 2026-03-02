@@ -7,6 +7,8 @@ TagManager:
   - misil
   - Enemy
   - PowerUp
+  - MisilEnemigo
+  - Nave
   layers:
   - Default
   - TransparentFX
