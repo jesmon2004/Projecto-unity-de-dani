@@ -54,7 +54,7 @@ public class EnemigoDisparadorController : MonoBehaviour
             if (explosionPrefab != null) Instantiate(explosionPrefab, transform.position, Quaternion.identity);
             
             //  20% de probabilidad de soltar el PowerUp
-            if (Random.Range(0, 100) < 100) //Acuerdate de ponerlo 20
+            if (Random.Range(0, 100) < 20) //Acuerdate de ponerlo 20
             {
                 Instantiate(powerUpPrefab, transform.position, Quaternion.identity);
             }
