@@ -16,6 +16,11 @@ public class ScoreManager : MonoBehaviour
     public void AddScore(int points)
     {
         score += points;
+        if (score < 0) 
+        {
+            score = 0; 
+        }
+        
         UpdateScoreUI();
     }
 

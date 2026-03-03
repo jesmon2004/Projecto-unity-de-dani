@@ -1,4 +1,5 @@
 using UnityEngine;
+using UnityEngine.SocialPlatforms.Impl;
 
 public class EnemigoController : MonoBehaviour
 {
@@ -13,6 +14,7 @@ public class EnemigoController : MonoBehaviour
         if (transform.position.y < -6f)
         {
             Destroy(gameObject);
+            ScoreManager.instance.AddScore(-50); 
         }
     }
 

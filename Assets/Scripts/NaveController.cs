@@ -95,17 +95,20 @@ public class NaveController : MonoBehaviour
     public void RecibirImpacto(int cantidad)
     {
         vidas -= cantidad; // Restar vidas
-        StartCoroutine(EfectoImpacto()); // Efecto de impacto
-
-        if (vidas == 2)
+        if (vidas == 3)
         {
-            barraVida.color = new Color(1f, 0.5f, 0f); // Naranja [cite: 285]
-            barraVida.fillAmount = 0.66f; // Quita 1/3 [cite: 285]
+            barraVida.color = Color.green; // Verde 
+            barraVida.fillAmount = 1f; // Llena al máximo
+        }
+        else if (vidas == 2)
+        {
+            barraVida.color = new Color(1f, 0.5f, 0f); // Naranja 
+            barraVida.fillAmount = 0.66f; // Quita 1/3 
         }
         else if (vidas == 1)
         {
-            barraVida.color = Color.red; // Rojo [cite: 286]
-            barraVida.fillAmount = 0.33f; // Quita 2/3 [cite: 286]
+            barraVida.color = Color.red; // Rojo 
+            barraVida.fillAmount = 0.33f; // Quita 2/3
         }
         else if (vidas <= 0)
         {
@@ -117,9 +120,17 @@ public class NaveController : MonoBehaviour
     }
 
     // Coroutine para el color de impacto
-    IEnumerator EfectoImpacto()
+    IEnumerator EfectoImpactoRojo()
     {
         spriteRenderer.color = Color.red; // Modificar a rojo
+        yield return new WaitForSeconds(0.1f); // Esperar
+        spriteRenderer.color = Color.white; // Volver normal
+    }
+
+    // Coroutine para el color de impacto
+    IEnumerator EfectoImpactoVerde()
+    {
+        spriteRenderer.color = Color.green; // Modificar a verde
         yield return new WaitForSeconds(0.1f); // Esperar
         spriteRenderer.color = Color.white; // Volver normal
     }
@@ -128,6 +139,7 @@ public class NaveController : MonoBehaviour
     {
         if (collision.CompareTag("Enemy"))
         {
+            StartCoroutine(EfectoImpactoRojo()); // Efecto de impacto
             RecibirImpacto(3); // Destruye del todo al chocar con una nave enemiga (Game Over)
         }
 
@@ -140,6 +152,21 @@ public class NaveController : MonoBehaviour
                 StopCoroutine(corrutinaPowerUp); 
             }
             corrutinaPowerUp = StartCoroutine(ActivarDobleDisparo(5f)); 
+        }
+        if (collision.CompareTag("PowerUpVida"))
+        {
+            audioSource.PlayOneShot(sonidoPowerUp);
+            StartCoroutine(EfectoImpactoVerde());
+            Destroy(collision.gameObject);
+            if (vidas < 3)
+            {
+                RecibirImpacto(-1); 
+            }
+            else
+            {
+                ScoreManager.instance.AddScore(100); 
+            }
+            
         }
     }
 

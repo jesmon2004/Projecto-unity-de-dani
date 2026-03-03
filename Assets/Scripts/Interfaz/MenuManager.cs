@@ -9,5 +9,7 @@ public class MenuManager : MonoBehaviour
         // "MainScene" debe coincidir EXACTAMENTE con el nombre de tu escena de juego
         SceneManager.LoadScene("MainScene"); 
     }
+    
+
 
 }

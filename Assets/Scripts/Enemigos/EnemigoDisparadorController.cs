@@ -13,6 +13,8 @@ public class EnemigoDisparadorController : MonoBehaviour
     public GameObject explosionPrefab;
     public int puntos = 20;
 
+    public GameObject powerUpPrefab; // Arrastra aquí el prefab de la estrella
+
     void Start()
     {
         posicionXInicial = transform.position.x;
@@ -30,6 +32,7 @@ public class EnemigoDisparadorController : MonoBehaviour
         if (transform.position.y < -6f)
         {
             Destroy(gameObject);
+            ScoreManager.instance.AddScore(-50); 
         }
     }
 
@@ -50,6 +53,12 @@ public class EnemigoDisparadorController : MonoBehaviour
             if (ScoreManager.instance != null) ScoreManager.instance.AddScore(puntos); 
             if (explosionPrefab != null) Instantiate(explosionPrefab, transform.position, Quaternion.identity);
             
+            //  20% de probabilidad de soltar el PowerUp
+            if (Random.Range(0, 100) < 100) //Acuerdate de ponerlo 20
+            {
+                Instantiate(powerUpPrefab, transform.position, Quaternion.identity);
+            }
+
             Destroy(collision.gameObject);
             Destroy(gameObject);
         }

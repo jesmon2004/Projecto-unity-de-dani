@@ -179,6 +179,7 @@ MonoBehaviour:
   firePoint: {fileID: 1909434609619235714}
   explosionPrefab: {fileID: 8566104395050547207, guid: d17626ca55f62d248a849f06c8134b8e, type: 3}
   puntos: 20
+  powerUpPrefab: {fileID: 7815462029396510707, guid: 6ecfe0f8a9c90814ea94f370fb2fcdbb, type: 3}
 --- !u!1 &7165415773510437391
 GameObject:
   m_ObjectHideFlags: 0

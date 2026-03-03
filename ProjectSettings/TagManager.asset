@@ -9,6 +9,7 @@ TagManager:
   - PowerUp
   - MisilEnemigo
   - Nave
+  - PowerUpVida
   layers:
   - Default
   - TransparentFX
